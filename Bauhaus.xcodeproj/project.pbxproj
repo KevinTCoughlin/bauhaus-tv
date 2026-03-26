@@ -22,6 +22,18 @@
 		CAFE004D0000000000000000 /* BackgroundTasks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAFE004C0000000000000000 /* BackgroundTasks.framework */; };
 		CAFE00500000000000000000 /* BauhausAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE004E0000000000000000 /* BauhausAPITests.swift */; };
 		CAFE00510000000000000000 /* HistoryNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE004F0000000000000000 /* HistoryNavigationTests.swift */; };
+		CAFE00520000000000000000 /* BauhausIOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE00610000000000000000 /* BauhausIOSApp.swift */; };
+		CAFE00530000000000000000 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE00620000000000000000 /* ContentView.swift */; };
+		CAFE00540000000000000000 /* ArtworkMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE001A0000000000000000 /* ArtworkMetadata.swift */; };
+		CAFE00550000000000000000 /* BauhausAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE001B0000000000000000 /* BauhausAPI.swift */; };
+		CAFE00560000000000000000 /* ArtworkViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE001C0000000000000000 /* ArtworkViewModel.swift */; };
+		CAFE00570000000000000000 /* FadeInAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE004A0000000000000000 /* FadeInAsyncImage.swift */; };
+		CAFE00580000000000000000 /* ArtworkAppIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE00640000000000000000 /* ArtworkAppIntents.swift */; };
+		CAFE00590000000000000000 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CAFE001D0000000000000000 /* Assets.xcassets */; };
+		CAFE005A0000000000000000 /* BauhausScreenSaverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE00650000000000000000 /* BauhausScreenSaverView.swift */; };
+		CAFE005B0000000000000000 /* BauhausAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE001B0000000000000000 /* BauhausAPI.swift */; };
+		CAFE005C0000000000000000 /* ArtworkMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE001A0000000000000000 /* ArtworkMetadata.swift */; };
+		CAFE005D0000000000000000 /* ScreenSaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAFE00600000000000000000 /* ScreenSaver.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +87,15 @@
 		CAFE004C0000000000000000 /* BackgroundTasks.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BackgroundTasks.framework; path = System/Library/Frameworks/BackgroundTasks.framework; sourceTree = SDKROOT; };
 		CAFE004E0000000000000000 /* BauhausAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BauhausAPITests.swift; sourceTree = "<group>"; };
 		CAFE004F0000000000000000 /* HistoryNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryNavigationTests.swift; sourceTree = "<group>"; };
+		CAFE005E0000000000000000 /* BauhausIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BauhausIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAFE005F0000000000000000 /* BauhausScreenSaver.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BauhausScreenSaver.saver; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAFE00600000000000000000 /* ScreenSaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScreenSaver.framework; path = System/Library/Frameworks/ScreenSaver.framework; sourceTree = SDKROOT; };
+		CAFE00610000000000000000 /* BauhausIOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BauhausIOSApp.swift; sourceTree = "<group>"; };
+		CAFE00620000000000000000 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		CAFE00630000000000000000 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CAFE00640000000000000000 /* ArtworkAppIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkAppIntents.swift; sourceTree = "<group>"; };
+		CAFE00650000000000000000 /* BauhausScreenSaverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BauhausScreenSaverView.swift; sourceTree = "<group>"; };
+		CAFE00660000000000000000 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +122,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CAFE006E0000000000000000 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAFE00710000000000000000 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAFE005D0000000000000000 /* ScreenSaver.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -109,9 +145,13 @@
 			children = (
 				CAFE00210000000000000000 /* Bauhaus */,
 				CAFE00250000000000000000 /* BauhausTopShelf */,
+				CAFE00670000000000000000 /* BauhausIOS */,
+				CAFE00680000000000000000 /* BauhausIntents */,
+				CAFE00690000000000000000 /* BauhausScreenSaver */,
 				CAFE00460000000000000000 /* BauhausTests */,
 				CAFE002E0000000000000000 /* TVServices.framework */,
 				CAFE004C0000000000000000 /* BackgroundTasks.framework */,
+				CAFE00600000000000000000 /* ScreenSaver.framework */,
 				CAFE00030000000000000000 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -122,6 +162,8 @@
 				CAFE00160000000000000000 /* Bauhaus.app */,
 				CAFE00170000000000000000 /* BauhausTopShelf.appex */,
 				CAFE00450000000000000000 /* BauhausTests.xctest */,
+				CAFE005E0000000000000000 /* BauhausIOS.app */,
+				CAFE005F0000000000000000 /* BauhausScreenSaver.saver */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -193,6 +235,33 @@
 			path = BauhausTests;
 			sourceTree = "<group>";
 		};
+		CAFE00670000000000000000 /* BauhausIOS */ = {
+			isa = PBXGroup;
+			children = (
+				CAFE00610000000000000000 /* BauhausIOSApp.swift */,
+				CAFE00620000000000000000 /* ContentView.swift */,
+				CAFE00630000000000000000 /* Info.plist */,
+			);
+			path = BauhausIOS;
+			sourceTree = "<group>";
+		};
+		CAFE00680000000000000000 /* BauhausIntents */ = {
+			isa = PBXGroup;
+			children = (
+				CAFE00640000000000000000 /* ArtworkAppIntents.swift */,
+			);
+			path = BauhausIntents;
+			sourceTree = "<group>";
+		};
+		CAFE00690000000000000000 /* BauhausScreenSaver */ = {
+			isa = PBXGroup;
+			children = (
+				CAFE00650000000000000000 /* BauhausScreenSaverView.swift */,
+				CAFE00660000000000000000 /* Info.plist */,
+			);
+			path = BauhausScreenSaver;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -249,6 +318,40 @@
 			productReference = CAFE00450000000000000000 /* BauhausTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		CAFE006A0000000000000000 /* BauhausIOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CAFE00740000000000000000 /* Build configuration list for PBXNativeTarget "BauhausIOS" */;
+			buildPhases = (
+				CAFE006C0000000000000000 /* Sources */,
+				CAFE006D0000000000000000 /* Resources */,
+				CAFE006E0000000000000000 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BauhausIOS;
+			productName = BauhausIOS;
+			productReference = CAFE005E0000000000000000 /* BauhausIOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CAFE006B0000000000000000 /* BauhausScreenSaver */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CAFE00770000000000000000 /* Build configuration list for PBXNativeTarget "BauhausScreenSaver" */;
+			buildPhases = (
+				CAFE006F0000000000000000 /* Sources */,
+				CAFE00700000000000000000 /* Resources */,
+				CAFE00710000000000000000 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BauhausScreenSaver;
+			productName = BauhausScreenSaver;
+			productReference = CAFE005F0000000000000000 /* BauhausScreenSaver.saver */;
+			productType = "com.apple.product-type.bundle.screensaver";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -269,6 +372,12 @@
 						CreatedOnToolsVersion = 15.0;
 						TestTargetID = CAFE00070000000000000000;
 					};
+					CAFE006A0000000000000000 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+					CAFE006B0000000000000000 = {
+						CreatedOnToolsVersion = 15.0;
+					};
 				};
 			};
 			buildConfigurationList = CAFE00040000000000000000 /* Build configuration list for PBXProject "Bauhaus" */;
@@ -287,6 +396,8 @@
 				CAFE00070000000000000000 /* Bauhaus */,
 				CAFE000F0000000000000000 /* BauhausTopShelf */,
 				CAFE003D0000000000000000 /* BauhausTests */,
+				CAFE006A0000000000000000 /* BauhausIOS */,
+				CAFE006B0000000000000000 /* BauhausScreenSaver */,
 			);
 		};
 /* End PBXProject section */
@@ -301,6 +412,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		CAFE00140000000000000000 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAFE006D0000000000000000 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAFE00590000000000000000 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAFE00700000000000000000 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -339,6 +465,30 @@
 				CAFE003C0000000000000000 /* ArtworkViewModelTests.swift in Sources */,
 				CAFE00500000000000000000 /* BauhausAPITests.swift in Sources */,
 				CAFE00510000000000000000 /* HistoryNavigationTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAFE006C0000000000000000 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAFE00520000000000000000 /* BauhausIOSApp.swift in Sources */,
+				CAFE00530000000000000000 /* ContentView.swift in Sources */,
+				CAFE00540000000000000000 /* ArtworkMetadata.swift in Sources */,
+				CAFE00550000000000000000 /* BauhausAPI.swift in Sources */,
+				CAFE00560000000000000000 /* ArtworkViewModel.swift in Sources */,
+				CAFE00570000000000000000 /* FadeInAsyncImage.swift in Sources */,
+				CAFE00580000000000000000 /* ArtworkAppIntents.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAFE006F0000000000000000 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAFE005A0000000000000000 /* BauhausScreenSaverView.swift in Sources */,
+				CAFE005B0000000000000000 /* BauhausAPI.swift in Sources */,
+				CAFE005C0000000000000000 /* ArtworkMetadata.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -590,6 +740,96 @@
 			};
 			name = Release;
 		};
+		CAFE00720000000000000000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				INFOPLIST_FILE = BauhausIOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cascadiacollections.bauhaus-ios";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CAFE00730000000000000000 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				INFOPLIST_FILE = BauhausIOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cascadiacollections.bauhaus-ios";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CAFE00750000000000000000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = BauhausScreenSaver/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cascadiacollections.bauhaus-screensaver";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = saver;
+			};
+			name = Debug;
+		};
+		CAFE00760000000000000000 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = BauhausScreenSaver/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cascadiacollections.bauhaus-screensaver";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = saver;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -625,6 +865,24 @@
 			buildConfigurations = (
 				CAFE003F0000000000000000 /* Debug */,
 				CAFE00400000000000000000 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CAFE00740000000000000000 /* Build configuration list for PBXNativeTarget "BauhausIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAFE00720000000000000000 /* Debug */,
+				CAFE00730000000000000000 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CAFE00770000000000000000 /* Build configuration list for PBXNativeTarget "BauhausScreenSaver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAFE00750000000000000000 /* Debug */,
+				CAFE00760000000000000000 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

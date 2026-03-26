@@ -1,8 +1,12 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var viewModel = ArtworkViewModel()
+    @State private var viewModel: ArtworkViewModel
     @State private var showMetadata = true
+
+    init(viewModel: ArtworkViewModel = ArtworkViewModel()) {
+        _viewModel = State(initialValue: viewModel)
+    }
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
@@ -62,7 +66,7 @@ struct ContentView: View {
 
             // Error overlay
             if let errorMessage = viewModel.error, viewModel.metadata == nil, !viewModel.isLoading {
-                ErrorOverlay(message: errorMessage) {
+                ErrorOverlay(message: errorMessage, isNotYetGenerated: viewModel.isNotYetGenerated) {
                     Task { await viewModel.load() }
                 }
             }
@@ -127,6 +131,7 @@ struct ContentView: View {
 
 private struct ErrorOverlay: View {
     let message: String
+    let isNotYetGenerated: Bool
     let onRetry: () -> Void
 
     var body: some View {
@@ -134,16 +139,18 @@ private struct ErrorOverlay: View {
             Color.black.opacity(0.75).ignoresSafeArea()
 
             VStack(spacing: 28) {
-                Image(systemName: "exclamationmark.triangle")
+                Image(systemName: isNotYetGenerated ? "clock" : "exclamationmark.triangle")
                     .font(.system(size: 80))
                     .foregroundStyle(.white.opacity(0.6))
 
-                Text("Couldn't load artwork")
+                Text(isNotYetGenerated ? "Not ready yet" : "Couldn't load artwork")
                     .font(.title2)
                     .fontWeight(.semibold)
                     .foregroundStyle(.white)
 
-                Text(message)
+                Text(isNotYetGenerated
+                     ? "Today's artwork is still being generated. Check back after 4 AM UTC."
+                     : message)
                     .font(.body)
                     .foregroundStyle(.white.opacity(0.55))
                     .multilineTextAlignment(.center)
@@ -155,10 +162,31 @@ private struct ErrorOverlay: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Error: \(message). Retry button available.")
+        .accessibilityLabel("\(isNotYetGenerated ? "Not ready yet" : "Error"): \(message). Retry button available.")
     }
 }
 
-#Preview("Today") {
+// MARK: - Previews
+
+#Preview("With metadata") {
+    let vm = ArtworkViewModel()
+    vm.metadata = ArtworkMetadata(
+        title: "The Bedroom",
+        artist: "Vincent van Gogh",
+        date: "1888-10-16",
+        styleTitle: "Suprematism",
+        styleArtist: "Kazimir Malevich"
+    )
+    return ContentView(viewModel: vm)
+}
+
+#Preview("Not yet generated") {
+    let vm = ArtworkViewModel()
+    vm.isNotYetGenerated = true
+    vm.error = BauhausAPI.APIError.notFound.errorDescription
+    return ContentView(viewModel: vm)
+}
+
+#Preview("Today (live)") {
     ContentView()
 }

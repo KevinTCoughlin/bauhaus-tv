@@ -35,3 +35,8 @@ struct FadeInAsyncImage: View {
         }
     }
 }
+
+#Preview("Loading") {
+    FadeInAsyncImage(url: URL(string: "https://bauhaus.cascadiacollections.workers.dev/api/today?format=jpeg")!)
+        .ignoresSafeArea()
+}

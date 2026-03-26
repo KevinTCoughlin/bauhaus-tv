@@ -6,6 +6,7 @@ final class ArtworkViewModel {
     var metadata: ArtworkMetadata?
     var isLoading = false
     var error: String?
+    var isNotYetGenerated = false
     var currentDate: Date = Date()
 
     private let api = BauhausAPI.shared
@@ -39,6 +40,7 @@ final class ArtworkViewModel {
         currentDate = date
         metadata = nil
         error = nil
+        isNotYetGenerated = false
         Task { await load() }
     }
 
@@ -55,12 +57,16 @@ final class ArtworkViewModel {
 
         isLoading = true
         error = nil
+        isNotYetGenerated = false
 
         do {
             metadata = try await api.fetchMetadata(for: currentDate)
             if Calendar.current.isDateInToday(currentDate) {
                 defaults.set(BauhausAPI.dateString(from: Date()), forKey: lastUpdatedKey)
             }
+        } catch BauhausAPI.APIError.notFound {
+            isNotYetGenerated = true
+            error = BauhausAPI.APIError.notFound.errorDescription
         } catch {
             self.error = error.localizedDescription
         }

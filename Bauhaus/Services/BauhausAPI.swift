@@ -44,10 +44,31 @@ final class BauhausAPI {
         return f.string(from: date)
     }
 
+    // MARK: - Errors
+
+    enum APIError: LocalizedError {
+        case notFound
+        case httpError(Int)
+
+        var errorDescription: String? {
+            switch self {
+            case .notFound:    return "Today's artwork hasn't been generated yet."
+            case .httpError(let code): return "Server error (\(code))."
+            }
+        }
+    }
+
     // MARK: - Fetch
 
     func fetchMetadata(for date: Date = Date()) async throws -> ArtworkMetadata {
-        let (data, _) = try await session.data(from: Self.metadataURL(for: date))
+        let (data, response) = try await session.data(from: Self.metadataURL(for: date))
+        if let http = response as? HTTPURLResponse {
+            switch http.statusCode {
+            case 200...299: break
+            case 404:       throw APIError.notFound
+            default:        throw APIError.httpError(http.statusCode)
+            }
+        }
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return try decoder.decode(ArtworkMetadata.self, from: data)

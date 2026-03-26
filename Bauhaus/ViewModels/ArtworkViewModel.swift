@@ -18,20 +18,27 @@ final class ArtworkViewModel {
         !Calendar.current.isDateInToday(currentDate)
     }
 
-    // MARK: - History navigation
+    // MARK: - Navigation
 
     func goToPreviousDay() {
         guard let prev = Calendar.current.date(byAdding: .day, value: -1, to: currentDate) else { return }
-        currentDate = prev
-        metadata = nil
-        Task { await load() }
+        navigateTo(date: prev)
     }
 
     func goToNextDay() {
         guard canGoForward,
               let next = Calendar.current.date(byAdding: .day, value: 1, to: currentDate) else { return }
-        currentDate = next
+        navigateTo(date: next)
+    }
+
+    func returnToToday() {
+        navigateTo(date: Date())
+    }
+
+    func navigateTo(date: Date) {
+        currentDate = date
         metadata = nil
+        error = nil
         Task { await load() }
     }
 

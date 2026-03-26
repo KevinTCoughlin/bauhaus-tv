@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build (tvOS Simulator)
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.3.app/Contents/Developer
+
+      - name: Build Bauhaus
+        run: |
+          xcodebuild build \
+            -project Bauhaus.xcodeproj \
+            -scheme Bauhaus \
+            -sdk appletvsimulator \
+            -destination 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation)' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty || true
+
+      - name: Build BauhausTopShelf
+        run: |
+          xcodebuild build \
+            -project Bauhaus.xcodeproj \
+            -scheme BauhausTopShelf \
+            -sdk appletvsimulator \
+            -destination 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation)' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty || true

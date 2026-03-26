@@ -18,6 +18,10 @@
 		CAFE002F0000000000000000 /* TVServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAFE002E0000000000000000 /* TVServices.framework */; };
 		CAFE003B0000000000000000 /* ArtworkMetadataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE00390000000000000000 /* ArtworkMetadataTests.swift */; };
 		CAFE003C0000000000000000 /* ArtworkViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE003A0000000000000000 /* ArtworkViewModelTests.swift */; };
+		CAFE004B0000000000000000 /* FadeInAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE004A0000000000000000 /* FadeInAsyncImage.swift */; };
+		CAFE004D0000000000000000 /* BackgroundTasks.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAFE004C0000000000000000 /* BackgroundTasks.framework */; };
+		CAFE00500000000000000000 /* BauhausAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE004E0000000000000000 /* BauhausAPITests.swift */; };
+		CAFE00510000000000000000 /* HistoryNavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE004F0000000000000000 /* HistoryNavigationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +71,10 @@
 		CAFE00390000000000000000 /* ArtworkMetadataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkMetadataTests.swift; sourceTree = "<group>"; };
 		CAFE003A0000000000000000 /* ArtworkViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkViewModelTests.swift; sourceTree = "<group>"; };
 		CAFE00450000000000000000 /* BauhausTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BauhausTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAFE004A0000000000000000 /* FadeInAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FadeInAsyncImage.swift; sourceTree = "<group>"; };
+		CAFE004C0000000000000000 /* BackgroundTasks.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BackgroundTasks.framework; path = System/Library/Frameworks/BackgroundTasks.framework; sourceTree = SDKROOT; };
+		CAFE004E0000000000000000 /* BauhausAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BauhausAPITests.swift; sourceTree = "<group>"; };
+		CAFE004F0000000000000000 /* HistoryNavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryNavigationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +82,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CAFE004D0000000000000000 /* BackgroundTasks.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,6 +111,7 @@
 				CAFE00250000000000000000 /* BauhausTopShelf */,
 				CAFE00460000000000000000 /* BauhausTests */,
 				CAFE002E0000000000000000 /* TVServices.framework */,
+				CAFE004C0000000000000000 /* BackgroundTasks.framework */,
 				CAFE00030000000000000000 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -124,6 +134,7 @@
 				CAFE00220000000000000000 /* Models */,
 				CAFE00230000000000000000 /* Services */,
 				CAFE00240000000000000000 /* ViewModels */,
+				CAFE00490000000000000000 /* Views */,
 				CAFE001D0000000000000000 /* Assets.xcassets */,
 				CAFE001F0000000000000000 /* Info.plist */,
 			);
@@ -154,6 +165,14 @@
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
+		CAFE00490000000000000000 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				CAFE004A0000000000000000 /* FadeInAsyncImage.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		CAFE00250000000000000000 /* BauhausTopShelf */ = {
 			isa = PBXGroup;
 			children = (
@@ -168,6 +187,8 @@
 			children = (
 				CAFE00390000000000000000 /* ArtworkMetadataTests.swift */,
 				CAFE003A0000000000000000 /* ArtworkViewModelTests.swift */,
+				CAFE004E0000000000000000 /* BauhausAPITests.swift */,
+				CAFE004F0000000000000000 /* HistoryNavigationTests.swift */,
 			);
 			path = BauhausTests;
 			sourceTree = "<group>";
@@ -298,6 +319,7 @@
 				CAFE00280000000000000000 /* ArtworkMetadata.swift in Sources */,
 				CAFE00290000000000000000 /* BauhausAPI.swift in Sources */,
 				CAFE002A0000000000000000 /* ArtworkViewModel.swift in Sources */,
+				CAFE004B0000000000000000 /* FadeInAsyncImage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,6 +337,8 @@
 			files = (
 				CAFE003B0000000000000000 /* ArtworkMetadataTests.swift in Sources */,
 				CAFE003C0000000000000000 /* ArtworkViewModelTests.swift in Sources */,
+				CAFE00500000000000000000 /* BauhausAPITests.swift in Sources */,
+				CAFE00510000000000000000 /* HistoryNavigationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

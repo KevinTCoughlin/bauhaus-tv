@@ -6,30 +6,14 @@ struct ContentView: View {
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            // Full-screen artwork
-            AsyncImage(url: viewModel.imageURL) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                case .failure:
-                    Color.black
-                        .overlay(
-                            Image(systemName: "photo")
-                                .foregroundStyle(.white.opacity(0.3))
-                                .font(.system(size: 100))
-                        )
-                case .empty:
-                    Color.black
-                        .overlay(ProgressView().tint(.white))
-                @unknown default:
-                    Color.black
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .clipped()
-            .ignoresSafeArea()
+            // Full-screen artwork with crossfade on URL change
+            FadeInAsyncImage(url: viewModel.imageURL)
+                .id(viewModel.imageURL)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipped()
+                .ignoresSafeArea()
+                .accessibilityLabel(accessibilityImageLabel)
+                .accessibilityHidden(false)
 
             // Bottom gradient scrim (always visible)
             VStack(spacing: 0) {
@@ -44,6 +28,22 @@ struct ContentView: View {
             .ignoresSafeArea(edges: .bottom)
             .allowsHitTesting(false)
 
+            // Past-date indicator (top-left when browsing history)
+            if !Calendar.current.isDateInToday(viewModel.currentDate) {
+                VStack {
+                    HStack {
+                        Text(viewModel.currentDate, style: .date)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.white.opacity(0.55))
+                            .padding(.horizontal, 80)
+                            .padding(.top, 60)
+                        Spacer()
+                    }
+                    Spacer()
+                }
+            }
+
             // Metadata overlay
             if showMetadata, let metadata = viewModel.metadata {
                 VStack(alignment: .leading, spacing: 16) {
@@ -57,15 +57,43 @@ struct ContentView: View {
                 }
                 .padding(80)
                 .transition(.opacity)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("\(metadata.title), styled after \(metadata.styleArtist), \(metadata.formattedDate)")
             }
         }
+        // Play/Pause toggles metadata overlay
         .onPlayPauseCommand {
             withAnimation(.easeInOut(duration: 0.3)) {
                 showMetadata.toggle()
+            }
+        }
+        // D-pad left/right navigates history
+        .focusable()
+        .onMoveCommand { direction in
+            switch direction {
+            case .left:
+                withAnimation { viewModel.goToPreviousDay() }
+            case .right:
+                withAnimation { viewModel.goToNextDay() }
+            default:
+                break
             }
         }
         .task {
             await viewModel.load()
         }
     }
+
+    private var accessibilityImageLabel: String {
+        if let metadata = viewModel.metadata {
+            return "Artwork: \(metadata.title) styled after \(metadata.styleArtist)"
+        }
+        return Calendar.current.isDateInToday(viewModel.currentDate)
+            ? "Today's daily artwork, loading"
+            : "Artwork for \(viewModel.currentDate.formatted(date: .abbreviated, time: .omitted)), loading"
+    }
+}
+
+#Preview("Today") {
+    ContentView()
 }

@@ -4,9 +4,7 @@ final class BauhausAPI {
     static let shared = BauhausAPI()
 
     private let session: URLSession
-
-    static let imageURL = URL(string: "https://bauhaus.cascadiacollections.workers.dev/api/today?format=jpeg")!
-    private static let metadataURL = URL(string: "https://bauhaus.cascadiacollections.workers.dev/api/today.json")!
+    private static let base = "https://bauhaus.cascadiacollections.workers.dev"
 
     private init() {
         let cache = URLCache(
@@ -23,8 +21,33 @@ final class BauhausAPI {
         session = URLSession(configuration: config)
     }
 
-    func fetchMetadata() async throws -> ArtworkMetadata {
-        let (data, _) = try await session.data(from: Self.metadataURL)
+    // MARK: - URL builders
+
+    static func imageURL(for date: Date = Date()) -> URL {
+        if Calendar.current.isDateInToday(date) {
+            return URL(string: "\(base)/api/today?format=jpeg")!
+        }
+        return URL(string: "\(base)/api/\(dateString(from: date))?format=jpeg")!
+    }
+
+    static func metadataURL(for date: Date = Date()) -> URL {
+        if Calendar.current.isDateInToday(date) {
+            return URL(string: "\(base)/api/today.json")!
+        }
+        return URL(string: "\(base)/api/\(dateString(from: date)).json")!
+    }
+
+    static func dateString(from date: Date) -> String {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        f.locale = Locale(identifier: "en_US_POSIX")
+        return f.string(from: date)
+    }
+
+    // MARK: - Fetch
+
+    func fetchMetadata(for date: Date = Date()) async throws -> ArtworkMetadata {
+        let (data, _) = try await session.data(from: Self.metadataURL(for: date))
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return try decoder.decode(ArtworkMetadata.self, from: data)

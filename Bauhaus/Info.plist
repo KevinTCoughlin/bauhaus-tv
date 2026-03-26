@@ -31,5 +31,9 @@
 			</array>
 		</dict>
 	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.cascadiacollections.bauhaus-tv.refresh</string>
+	</array>
 </dict>
 </plist>

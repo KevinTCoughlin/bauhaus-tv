@@ -16,6 +16,8 @@
 		CAFE002C0000000000000000 /* TopShelfProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE001E0000000000000000 /* TopShelfProvider.swift */; };
 		CAFE002D0000000000000000 /* BauhausTopShelf.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CAFE00170000000000000000 /* BauhausTopShelf.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CAFE002F0000000000000000 /* TVServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAFE002E0000000000000000 /* TVServices.framework */; };
+		CAFE003B0000000000000000 /* ArtworkMetadataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE00390000000000000000 /* ArtworkMetadataTests.swift */; };
+		CAFE003C0000000000000000 /* ArtworkViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE003A0000000000000000 /* ArtworkViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,6 +27,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = CAFE000F0000000000000000;
 			remoteInfo = BauhausTopShelf;
+		};
+		CAFE00440000000000000000 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CAFE00010000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CAFE00070000000000000000;
+			remoteInfo = Bauhaus;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -55,6 +64,9 @@
 		CAFE001F0000000000000000 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CAFE00200000000000000000 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CAFE002E0000000000000000 /* TVServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TVServices.framework; path = System/Library/Frameworks/TVServices.framework; sourceTree = SDKROOT; };
+		CAFE00390000000000000000 /* ArtworkMetadataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkMetadataTests.swift; sourceTree = "<group>"; };
+		CAFE003A0000000000000000 /* ArtworkViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkViewModelTests.swift; sourceTree = "<group>"; };
+		CAFE00450000000000000000 /* BauhausTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BauhausTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +85,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CAFE00420000000000000000 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -81,6 +100,7 @@
 			children = (
 				CAFE00210000000000000000 /* Bauhaus */,
 				CAFE00250000000000000000 /* BauhausTopShelf */,
+				CAFE00460000000000000000 /* BauhausTests */,
 				CAFE002E0000000000000000 /* TVServices.framework */,
 				CAFE00030000000000000000 /* Products */,
 			);
@@ -91,6 +111,7 @@
 			children = (
 				CAFE00160000000000000000 /* Bauhaus.app */,
 				CAFE00170000000000000000 /* BauhausTopShelf.appex */,
+				CAFE00450000000000000000 /* BauhausTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -142,6 +163,15 @@
 			path = BauhausTopShelf;
 			sourceTree = "<group>";
 		};
+		CAFE00460000000000000000 /* BauhausTests */ = {
+			isa = PBXGroup;
+			children = (
+				CAFE00390000000000000000 /* ArtworkMetadataTests.swift */,
+				CAFE003A0000000000000000 /* ArtworkViewModelTests.swift */,
+			);
+			path = BauhausTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -181,6 +211,23 @@
 			productReference = CAFE00170000000000000000 /* BauhausTopShelf.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		CAFE003D0000000000000000 /* BauhausTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CAFE003E0000000000000000 /* Build configuration list for PBXNativeTarget "BauhausTests" */;
+			buildPhases = (
+				CAFE00410000000000000000 /* Sources */,
+				CAFE00420000000000000000 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CAFE00430000000000000000 /* PBXTargetDependency */,
+			);
+			name = BauhausTests;
+			productName = BauhausTests;
+			productReference = CAFE00450000000000000000 /* BauhausTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -196,6 +243,10 @@
 					};
 					CAFE000F0000000000000000 = {
 						CreatedOnToolsVersion = 15.0;
+					};
+					CAFE003D0000000000000000 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = CAFE00070000000000000000;
 					};
 				};
 			};
@@ -214,6 +265,7 @@
 			targets = (
 				CAFE00070000000000000000 /* Bauhaus */,
 				CAFE000F0000000000000000 /* BauhausTopShelf */,
+				CAFE003D0000000000000000 /* BauhausTests */,
 			);
 		};
 /* End PBXProject section */
@@ -257,6 +309,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CAFE00410000000000000000 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAFE003B0000000000000000 /* ArtworkMetadataTests.swift in Sources */,
+				CAFE003C0000000000000000 /* ArtworkViewModelTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -264,6 +325,11 @@
 			isa = PBXTargetDependency;
 			target = CAFE000F0000000000000000 /* BauhausTopShelf */;
 			targetProxy = CAFE00320000000000000000 /* PBXContainerItemProxy */;
+		};
+		CAFE00430000000000000000 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CAFE00070000000000000000 /* Bauhaus */;
+			targetProxy = CAFE00440000000000000000 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -468,6 +534,38 @@
 			};
 			name = Release;
 		};
+		CAFE003F0000000000000000 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cascadiacollections.bauhaus-tv.tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bauhaus.app/Bauhaus";
+				TVOS_DEPLOYMENT_TARGET = 17.0;
+			};
+			name = Debug;
+		};
+		CAFE00400000000000000000 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cascadiacollections.bauhaus-tv.tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bauhaus.app/Bauhaus";
+				TVOS_DEPLOYMENT_TARGET = 17.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -494,6 +592,15 @@
 			buildConfigurations = (
 				CAFE00110000000000000000 /* Debug */,
 				CAFE00120000000000000000 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CAFE003E0000000000000000 /* Build configuration list for PBXNativeTarget "BauhausTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAFE003F0000000000000000 /* Debug */,
+				CAFE00400000000000000000 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

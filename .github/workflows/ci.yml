@@ -6,9 +6,16 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
-  build:
-    name: Build (tvOS Simulator)
+  build-and-test:
+    name: Build & Test (tvOS Simulator)
     runs-on: macos-15
 
     steps:
@@ -17,23 +24,11 @@ jobs:
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_16.3.app/Contents/Developer
 
-      - name: Build Bauhaus
+      - name: Build & Test
         run: |
-          xcodebuild build \
+          xcodebuild test \
             -project Bauhaus.xcodeproj \
             -scheme Bauhaus \
-            -sdk appletvsimulator \
-            -destination 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation)' \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            | xcpretty || true
-
-      - name: Build BauhausTopShelf
-        run: |
-          xcodebuild build \
-            -project Bauhaus.xcodeproj \
-            -scheme BauhausTopShelf \
             -sdk appletvsimulator \
             -destination 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation)' \
             CODE_SIGN_IDENTITY="" \

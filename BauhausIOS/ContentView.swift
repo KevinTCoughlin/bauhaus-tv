@@ -1,15 +1,17 @@
 import SwiftUI
+import Photos
 
 struct ContentView: View {
     @State private var viewModel: ArtworkViewModel
     @State private var wallpaperToast: WallpaperToastState?
 
     private enum WallpaperToastState: Equatable {
-        case success, failure(String)
+        case success, saveSuccess, failure(String)
 
         var message: String {
             switch self {
             case .success:           return "Wallpaper set!"
+            case .saveSuccess:       return "Saved to Photos!"
             case .failure(let msg):  return "Failed: \(msg)"
             }
         }
@@ -121,6 +123,14 @@ struct ContentView: View {
                 Label("Set as Wallpaper", systemImage: "photo.on.rectangle.angled")
             }
         }
+        #else
+        .contextMenu {
+            Button {
+                Task { await saveToPhotos() }
+            } label: {
+                Label("Save to Photos", systemImage: "square.and.arrow.down")
+            }
+        }
         #endif
         .task {
             await viewModel.load()
@@ -159,6 +169,26 @@ struct ContentView: View {
         do {
             try await WallpaperService.shared.setWallpaper(from: url)
             withAnimation(.snappy) { wallpaperToast = .success }
+        } catch {
+            withAnimation(.snappy) { wallpaperToast = .failure(error.localizedDescription) }
+        }
+        try? await Task.sleep(for: .seconds(2.5))
+        withAnimation(.easeOut) { wallpaperToast = nil }
+    }
+    #else
+    @MainActor
+    private func saveToPhotos() async {
+        let url = viewModel.imageURL
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            guard let image = UIImage(data: data) else {
+                withAnimation(.snappy) { wallpaperToast = .failure("Couldn't decode image.") }
+                return
+            }
+            try await PHPhotoLibrary.shared().performChanges {
+                PHAssetChangeRequest.creationRequestForAsset(from: image)
+            }
+            withAnimation(.snappy) { wallpaperToast = .saveSuccess }
         } catch {
             withAnimation(.snappy) { wallpaperToast = .failure(error.localizedDescription) }
         }

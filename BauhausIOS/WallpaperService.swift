@@ -18,17 +18,18 @@ final class WallpaperService {
 
     /// Downloads the image at `url` and sets it as the desktop wallpaper on all screens.
     func setWallpaper(from url: URL) async throws {
-        let dest = FileManager.default.temporaryDirectory
+        // Write to ~/Pictures so the file is accessible outside the sandbox
+        let home = NSHomeDirectory()
+        let dest = URL(fileURLWithPath: home)
+            .appendingPathComponent("Pictures")
             .appendingPathComponent("bauhaus-wallpaper.jpg")
 
-        // Use the shared cache — the image is likely already cached by AsyncImage
         let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
         let (data, _) = try await URLSession.shared.data(for: request)
 
         try data.write(to: dest, options: .atomic)
 
-        // Use POSIX file coercion so no path escaping is needed.
-        // dest.path is fully app-controlled (tmp dir + hardcoded filename).
+        // Use POSIX file coercion; path is app-controlled.
         let script = "tell application \"System Events\" to tell every desktop to set picture to POSIX file \"\(dest.path)\""
 
         var pid: pid_t = 0

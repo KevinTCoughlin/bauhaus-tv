@@ -26,6 +26,10 @@ final class HistoryNavigationTests: XCTestCase {
         XCTAssertFalse(viewModel.canGoForward)
     }
 
+    func testCanGoBackFromToday() {
+        XCTAssertTrue(viewModel.canGoBack)
+    }
+
     // MARK: - goToPreviousDay
 
     func testGoToPreviousDayMovesBackOne() {
@@ -50,6 +54,29 @@ final class HistoryNavigationTests: XCTestCase {
         let todayURL = viewModel.imageURL
         viewModel.goToPreviousDay()
         XCTAssertNotEqual(viewModel.imageURL, todayURL)
+    }
+
+    // MARK: - canGoBack boundary (7-day window)
+
+    func testCannotGoBackBeyondSevenDays() {
+        // Navigate back 6 times (today + 6 = 7 days)
+        for _ in 0..<6 {
+            viewModel.goToPreviousDay()
+        }
+        XCTAssertFalse(viewModel.canGoBack, "Should not be able to go beyond 7-day window")
+    }
+
+    func testGoToPreviousDayStopsAtBoundary() {
+        // Navigate to boundary
+        for _ in 0..<6 {
+            viewModel.goToPreviousDay()
+        }
+        let dateAtBoundary = viewModel.currentDate
+        viewModel.goToPreviousDay() // Should be a no-op
+        XCTAssertEqual(
+            Calendar.current.startOfDay(for: viewModel.currentDate),
+            Calendar.current.startOfDay(for: dateAtBoundary)
+        )
     }
 
     // MARK: - goToNextDay
@@ -87,8 +114,6 @@ final class HistoryNavigationTests: XCTestCase {
     }
 
     func testNavigateToFutureDateSetsCurrent() {
-        // The app doesn't block future dates at the navigate level —
-        // the API will return an error for dates with no generated image.
         let future = Calendar.current.date(byAdding: .day, value: 5, to: Date())!
         viewModel.navigateTo(date: future)
         XCTAssertFalse(Calendar.current.isDateInToday(viewModel.currentDate))
@@ -103,7 +128,7 @@ final class HistoryNavigationTests: XCTestCase {
     }
 
     func testReturnToTodayWhenAlreadyToday() {
-        viewModel.returnToToday() // Should still work (just reloads)
+        viewModel.returnToToday()
         XCTAssertTrue(Calendar.current.isDateInToday(viewModel.currentDate))
     }
 
@@ -117,8 +142,8 @@ final class HistoryNavigationTests: XCTestCase {
     // MARK: - Helpers
 
     private func date(year: Int, month: Int, day: Int) -> Date {
-        var c = DateComponents()
-        c.year = year; c.month = month; c.day = day; c.hour = 12
-        return Calendar.current.date(from: c)!
+        var comps = DateComponents()
+        comps.year = year; comps.month = month; comps.day = day; comps.hour = 12
+        return Calendar.current.date(from: comps)!
     }
 }

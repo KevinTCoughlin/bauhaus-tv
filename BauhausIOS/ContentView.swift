@@ -2,10 +2,30 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var viewModel: ArtworkViewModel
-    @State private var showMetadata = true
+    @State private var wallpaperToast: WallpaperToastState?
 
-    init(viewModel: ArtworkViewModel = ArtworkViewModel()) {
+    private enum WallpaperToastState: Equatable {
+        case success, failure(String)
+
+        var message: String {
+            switch self {
+            case .success:           return "Wallpaper set!"
+            case .failure(let msg):  return "Failed: \(msg)"
+            }
+        }
+
+        var isError: Bool {
+            if case .failure = self { return true }
+            return false
+        }
+    }
+
+    init(viewModel: ArtworkViewModel) {
         _viewModel = State(initialValue: viewModel)
+    }
+
+    init() {
+        self.init(viewModel: ArtworkViewModel())
     }
 
     var body: some View {
@@ -17,51 +37,35 @@ struct ContentView: View {
                 .clipped()
                 .ignoresSafeArea()
                 .accessibilityLabel(accessibilityImageLabel)
+                .accessibilityAddTraits(.isImage)
 
-            // Bottom gradient scrim
-            VStack(spacing: 0) {
-                Spacer()
-                LinearGradient(
-                    colors: [.clear, .black.opacity(0.85)],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: 300)
-            }
-            .ignoresSafeArea(edges: .bottom)
-            .allowsHitTesting(false)
-
-            // Past-date indicator (top-left when browsing history)
+            // Past-date indicator (top-leading, safe-area aware)
             if !Calendar.current.isDateInToday(viewModel.currentDate) {
-                VStack {
-                    HStack {
-                        Text(viewModel.currentDate, style: .date)
-                            .font(.caption)
-                            .fontWeight(.medium)
-                            .foregroundStyle(.white.opacity(0.55))
-                            .padding(.horizontal, 20)
-                            .padding(.top, 60)
-                        Spacer()
-                    }
-                    Spacer()
-                }
+                Text(viewModel.currentDate, style: .date)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(.ultraThinMaterial, in: Capsule())
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .padding()
+                    .accessibilityLabel("Viewing \(viewModel.currentDate.formatted(date: .long, time: .omitted))")
             }
 
-            // Metadata overlay
-            if showMetadata, let metadata = viewModel.metadata {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(metadata.title)
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                    Text("\(metadata.styleArtist) · \(metadata.formattedDate)")
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.75))
-                }
-                .padding(40)
-                .transition(.opacity)
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("\(metadata.title), styled after \(metadata.styleArtist), \(metadata.formattedDate)")
+            // Loading indicator during navigation
+            if viewModel.isLoading {
+                ProgressView()
+                    .tint(.white)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .allowsHitTesting(false)
+            }
+
+            // Metadata: accessible via VoiceOver only, no visible text
+            if let metadata = viewModel.metadata {
+                Color.clear
+                    .accessibilityLabel("Artwork: \(metadata.title) styled after \(metadata.styleArtist), \(metadata.formattedDate)")
+                    .accessibilityAddTraits(.isStaticText)
             }
 
             // Error overlay
@@ -70,41 +74,102 @@ struct ContentView: View {
                     Task { await viewModel.load() }
                 }
             }
-        }
-        // Tap: toggle metadata overlay
-        .onTapGesture {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                showMetadata.toggle()
+
+            // Wallpaper toast
+            if let toast = wallpaperToast {
+                toastView(toast)
             }
         }
-        // Swipe left/right: navigate history
+        // Swipe left/right: navigate history (touch)
         .gesture(
             DragGesture(minimumDistance: 50)
                 .onEnded { value in
                     let dx = value.translation.width
                     if dx < -50 {
-                        withAnimation { viewModel.goToPreviousDay() }
+                        withAnimation(.snappy) { viewModel.goToPreviousDay() }
                     } else if dx > 50 {
                         guard viewModel.canGoForward else { return }
-                        withAnimation { viewModel.goToNextDay() }
+                        withAnimation(.snappy) { viewModel.goToNextDay() }
                     }
                 }
         )
+        // Arrow keys: navigate history (Mac keyboard/trackpad)
+        .focusable()
+        .onKeyPress(.leftArrow) {
+            withAnimation(.snappy) { viewModel.goToPreviousDay() }
+            return .handled
+        }
+        .onKeyPress(.rightArrow) {
+            guard viewModel.canGoForward else { return .ignored }
+            withAnimation(.snappy) { viewModel.goToNextDay() }
+            return .handled
+        }
         // Deep link: bauhaus://open?date=YYYY-MM-DD or bauhaus-ios://open?date=YYYY-MM-DD
         .onOpenURL { url in
             guard let date = date(from: url) else { return }
             withAnimation { viewModel.navigateTo(date: date) }
         }
+        // Long press: set as macOS wallpaper
+        #if targetEnvironment(macCatalyst)
+        .onLongPressGesture(minimumDuration: 0.6) {
+            Task { await setWallpaper() }
+        }
+        .contextMenu {
+            Button {
+                Task { await setWallpaper() }
+            } label: {
+                Label("Set as Wallpaper", systemImage: "photo.on.rectangle.angled")
+            }
+        }
+        #endif
         .task {
             await viewModel.load()
         }
     }
 
+    // MARK: - Subviews
+
+    @ViewBuilder
+    private func toastView(_ toast: WallpaperToastState) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: toast.isError ? "exclamationmark.circle" : "checkmark.circle.fill")
+            Text(toast.message)
+                .fontWeight(.medium)
+        }
+        .font(.subheadline)
+        .foregroundStyle(.primary)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(.regularMaterial, in: Capsule())
+        .shadow(color: .black.opacity(0.15), radius: 8, y: 4)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        .padding(.bottom, 24)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .allowsHitTesting(false)
+        .accessibilityLabel(toast.message)
+        .accessibilityAddTraits(.isStaticText)
+    }
+
     // MARK: - Helpers
+
+    #if targetEnvironment(macCatalyst)
+    @MainActor
+    private func setWallpaper() async {
+        let url = viewModel.imageURL
+        do {
+            try await WallpaperService.shared.setWallpaper(from: url)
+            withAnimation(.snappy) { wallpaperToast = .success }
+        } catch {
+            withAnimation(.snappy) { wallpaperToast = .failure(error.localizedDescription) }
+        }
+        try? await Task.sleep(for: .seconds(2.5))
+        withAnimation(.easeOut) { wallpaperToast = nil }
+    }
+    #endif
 
     private var accessibilityImageLabel: String {
         if let metadata = viewModel.metadata {
-            return "Artwork: \(metadata.title) styled after \(metadata.styleArtist)"
+            return "Artwork: \(metadata.title) styled after \(metadata.styleArtist), \(metadata.formattedDate)"
         }
         return Calendar.current.isDateInToday(viewModel.currentDate)
             ? "Today's daily artwork, loading"
@@ -113,16 +178,13 @@ struct ContentView: View {
 
     /// Parses `bauhaus://open?date=YYYY-MM-DD` or `bauhaus-ios://open?date=YYYY-MM-DD` → Date
     private func date(from url: URL) -> Date? {
-        guard (url.scheme == "bauhaus" || url.scheme == "bauhaus-ios"),
+        guard url.scheme == "bauhaus" || url.scheme == "bauhaus-ios",
               url.host == "open",
               let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
               let dateStr = components.queryItems?.first(where: { $0.name == "date" })?.value
         else { return nil }
 
-        let f = DateFormatter()
-        f.dateFormat = "yyyy-MM-dd"
-        f.locale = Locale(identifier: "en_US_POSIX")
-        return f.date(from: dateStr)
+        return BauhausAPI.iso8601DateFormatter.date(from: dateStr)
     }
 }
 
@@ -135,33 +197,32 @@ private struct ErrorOverlay: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.75).ignoresSafeArea()
+            Color.black.opacity(0.5).ignoresSafeArea()
 
             VStack(spacing: 20) {
                 Image(systemName: isNotYetGenerated ? "clock" : "exclamationmark.triangle")
-                    .font(.system(size: 60))
-                    .foregroundStyle(.white.opacity(0.6))
+                    .font(.system(size: 48))
+                    .foregroundStyle(.secondary)
 
                 Text(isNotYetGenerated ? "Not ready yet" : "Couldn't load artwork")
                     .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
 
                 Text(isNotYetGenerated
-                     ? "Today's artwork is still being generated. Check back after 4 AM UTC."
+                     ? "Today's artwork is still being generated.\nCheck back after 4 AM UTC."
                      : message)
                     .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.55))
+                    .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
+                    .frame(maxWidth: 300)
 
                 Button("Retry", action: onRetry)
                     .buttonStyle(.bordered)
-                    .tint(.white)
             }
+            .padding(32)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(isNotYetGenerated ? "Not ready yet" : "Error"): \(message). Retry button available.")
+        .accessibilityElement(children: .contain)
     }
 }
 

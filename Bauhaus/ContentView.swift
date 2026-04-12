@@ -3,9 +3,14 @@ import SwiftUI
 struct ContentView: View {
     @State private var viewModel: ArtworkViewModel
     @State private var showMetadata = true
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(viewModel: ArtworkViewModel = ArtworkViewModel()) {
+    init(viewModel: ArtworkViewModel) {
         _viewModel = State(initialValue: viewModel)
+    }
+
+    init() {
+        self.init(viewModel: ArtworkViewModel())
     }
 
     var body: some View {
@@ -17,51 +22,68 @@ struct ContentView: View {
                 .clipped()
                 .ignoresSafeArea()
                 .accessibilityLabel(accessibilityImageLabel)
+                .accessibilityAddTraits(.isImage)
 
-            // Bottom gradient scrim
+            // Bottom gradient scrim for metadata legibility
             VStack(spacing: 0) {
                 Spacer()
                 LinearGradient(
-                    colors: [.clear, .black.opacity(0.85)],
+                    stops: [
+                        .init(color: .clear, location: 0),
+                        .init(color: .black.opacity(0.6), location: 0.6),
+                        .init(color: .black.opacity(0.8), location: 1.0)
+                    ],
                     startPoint: .top,
                     endPoint: .bottom
                 )
-                .frame(height: 400)
+                .frame(height: 360)
             }
             .ignoresSafeArea(edges: .bottom)
             .allowsHitTesting(false)
+            .opacity(showMetadata && viewModel.metadata != nil ? 1 : 0)
+            .animation(.easeInOut(duration: 0.3), value: showMetadata)
 
-            // Past-date indicator (top-left when browsing history)
+            // Past-date indicator (top-leading, safe-area aware)
             if !Calendar.current.isDateInToday(viewModel.currentDate) {
-                VStack {
-                    HStack {
-                        Text(viewModel.currentDate, style: .date)
-                            .font(.caption)
-                            .fontWeight(.medium)
-                            .foregroundStyle(.white.opacity(0.55))
-                            .padding(.horizontal, 80)
-                            .padding(.top, 60)
-                        Spacer()
-                    }
-                    Spacer()
-                }
+                Text(viewModel.currentDate, style: .date)
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    .accessibilityLabel("Viewing \(viewModel.currentDate.formatted(date: .long, time: .omitted))")
+            }
+
+            // Loading indicator during navigation
+            if viewModel.isLoading {
+                ProgressView()
+                    .tint(.white)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .allowsHitTesting(false)
             }
 
             // Metadata overlay
             if showMetadata, let metadata = viewModel.metadata {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 12) {
                     Text(metadata.title)
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.7)
                     Text("\(metadata.styleArtist) · \(metadata.formattedDate)")
                         .font(.title3)
-                        .foregroundStyle(.white.opacity(0.75))
+                        .foregroundStyle(.white.opacity(0.8))
+                        .lineLimit(1)
                 }
-                .padding(80)
-                .transition(.opacity)
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("\(metadata.title), styled after \(metadata.styleArtist), \(metadata.formattedDate)")
+                .padding(.horizontal, 80)
+                .padding(.bottom, 80)
+                .padding(.top, 16)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+                .transition(.opacity.animation(.easeInOut(duration: 0.25)))
+                .accessibilityHidden(true)
             }
 
             // Error overlay
@@ -73,7 +95,7 @@ struct ContentView: View {
         }
         // Play/Pause: toggle metadata overlay
         .onPlayPauseCommand {
-            withAnimation(.easeInOut(duration: 0.3)) {
+            withAnimation(.easeInOut(duration: 0.25)) {
                 showMetadata.toggle()
             }
         }
@@ -86,8 +108,8 @@ struct ContentView: View {
         .focusable()
         .onMoveCommand { direction in
             switch direction {
-            case .left:  withAnimation { viewModel.goToPreviousDay() }
-            case .right: withAnimation { viewModel.goToNextDay() }
+            case .left:  withAnimation(.snappy) { viewModel.goToPreviousDay() }
+            case .right: withAnimation(.snappy) { viewModel.goToNextDay() }
             default: break
             }
         }
@@ -105,7 +127,7 @@ struct ContentView: View {
 
     private var accessibilityImageLabel: String {
         if let metadata = viewModel.metadata {
-            return "Artwork: \(metadata.title) styled after \(metadata.styleArtist)"
+            return "Artwork: \(metadata.title) styled after \(metadata.styleArtist), \(metadata.formattedDate)"
         }
         return Calendar.current.isDateInToday(viewModel.currentDate)
             ? "Today's daily artwork, loading"
@@ -120,10 +142,7 @@ struct ContentView: View {
               let dateStr = components.queryItems?.first(where: { $0.name == "date" })?.value
         else { return nil }
 
-        let f = DateFormatter()
-        f.dateFormat = "yyyy-MM-dd"
-        f.locale = Locale(identifier: "en_US_POSIX")
-        return f.date(from: dateStr)
+        return BauhausAPI.iso8601DateFormatter.date(from: dateStr)
     }
 }
 
@@ -136,33 +155,33 @@ private struct ErrorOverlay: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.75).ignoresSafeArea()
+            Color.black.opacity(0.6).ignoresSafeArea()
 
             VStack(spacing: 28) {
                 Image(systemName: isNotYetGenerated ? "clock" : "exclamationmark.triangle")
-                    .font(.system(size: 80))
-                    .foregroundStyle(.white.opacity(0.6))
+                    .font(.system(size: 64))
+                    .foregroundStyle(.secondary)
 
                 Text(isNotYetGenerated ? "Not ready yet" : "Couldn't load artwork")
                     .font(.title2)
                     .fontWeight(.semibold)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.primary)
 
                 Text(isNotYetGenerated
-                     ? "Today's artwork is still being generated. Check back after 4 AM UTC."
+                     ? "Today's artwork is still being generated.\nCheck back after 4 AM UTC."
                      : message)
                     .font(.body)
-                    .foregroundStyle(.white.opacity(0.55))
+                    .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 120)
 
                 Button("Retry", action: onRetry)
                     .buttonStyle(.bordered)
-                    .tint(.white)
             }
+            .padding(60)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(isNotYetGenerated ? "Not ready yet" : "Error"): \(message). Retry button available.")
+        .accessibilityElement(children: .contain)
     }
 }
 

@@ -1,5 +1,6 @@
 import SwiftUI
 import BackgroundTasks
+import os
 
 private let refreshTaskID = "com.cascadiacollections.bauhaus-tv.refresh"
 
@@ -36,14 +37,30 @@ struct BauhausApp: App {
 private func handleBackgroundRefresh(task: BGAppRefreshTask) {
     scheduleRefresh() // Reschedule before doing work
 
+    let completed = OSAllocatedUnfairLock(initialState: false)
+
+    let completeOnce: (Bool) -> Void = { success in
+        let alreadyCompleted = completed.withLock { done in
+            if done { return true }
+            done = true
+            return false
+        }
+        guard !alreadyCompleted else { return }
+        task.setTaskCompleted(success: success)
+    }
+
     let fetch = Task {
-        _ = try? await BauhausAPI.shared.fetchMetadata()
-        task.setTaskCompleted(success: true)
+        do {
+            _ = try await BauhausAPI.shared.fetchMetadata()
+            completeOnce(true)
+        } catch {
+            completeOnce(false)
+        }
     }
 
     task.expirationHandler = {
         fetch.cancel()
-        task.setTaskCompleted(success: false)
+        completeOnce(false)
     }
 }
 

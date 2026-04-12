@@ -32,9 +32,9 @@ final class BauhausScreenSaverView: ScreenSaverView {
             imageView.topAnchor.constraint(equalTo: topAnchor),
             imageView.bottomAnchor.constraint(equalTo: bottomAnchor),
             imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: trailingAnchor)
         ])
-        animationTimeInterval = 1.0 / 30.0
+        animationTimeInterval = 60.0
     }
 
     required init?(coder: NSCoder) {
@@ -62,10 +62,12 @@ final class BauhausScreenSaverView: ScreenSaverView {
     private func loadTodayImage() {
         lastLoadedDate = BauhausAPI.dateString(from: Date())
         let url = BauhausAPI.imageURL(for: Date())
-        session.dataTask(with: url) { [weak self] data, _, _ in
-            guard let data, let image = NSImage(data: data) else { return }
+        var request = URLRequest(url: url)
+        request.cachePolicy = .returnCacheDataElseLoad
+        session.dataTask(with: request) { [weak self] data, _, _ in
+            guard let self, let data, let image = NSImage(data: data) else { return }
             DispatchQueue.main.async {
-                self?.imageView.image = image
+                self.imageView.image = image
             }
         }.resume()
     }

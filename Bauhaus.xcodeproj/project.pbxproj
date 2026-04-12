@@ -34,6 +34,7 @@
 		CAFE005B0000000000000000 /* BauhausAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE001B0000000000000000 /* BauhausAPI.swift */; };
 		CAFE005C0000000000000000 /* ArtworkMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFE001A0000000000000000 /* ArtworkMetadata.swift */; };
 		CAFE005D0000000000000000 /* ScreenSaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAFE00600000000000000000 /* ScreenSaver.framework */; };
+		FBB108A425BB2237ECD952A6 /* WallpaperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 198A104CE525589D3D668BA4 /* WallpaperService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +69,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		198A104CE525589D3D668BA4 /* WallpaperService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WallpaperService.swift; sourceTree = "<group>"; };
 		CAFE00160000000000000000 /* Bauhaus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bauhaus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAFE00170000000000000000 /* BauhausTopShelf.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BauhausTopShelf.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAFE00180000000000000000 /* BauhausApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BauhausApp.swift; sourceTree = "<group>"; };
@@ -207,14 +209,6 @@
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
-		CAFE00490000000000000000 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				CAFE004A0000000000000000 /* FadeInAsyncImage.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
 		CAFE00250000000000000000 /* BauhausTopShelf */ = {
 			isa = PBXGroup;
 			children = (
@@ -235,12 +229,21 @@
 			path = BauhausTests;
 			sourceTree = "<group>";
 		};
+		CAFE00490000000000000000 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				CAFE004A0000000000000000 /* FadeInAsyncImage.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		CAFE00670000000000000000 /* BauhausIOS */ = {
 			isa = PBXGroup;
 			children = (
 				CAFE00610000000000000000 /* BauhausIOSApp.swift */,
 				CAFE00620000000000000000 /* ContentView.swift */,
 				CAFE00630000000000000000 /* Info.plist */,
+				198A104CE525589D3D668BA4 /* WallpaperService.swift */,
 			);
 			path = BauhausIOS;
 			sourceTree = "<group>";
@@ -479,6 +482,7 @@
 				CAFE00560000000000000000 /* ArtworkViewModel.swift in Sources */,
 				CAFE00570000000000000000 /* FadeInAsyncImage.swift in Sources */,
 				CAFE00580000000000000000 /* ArtworkAppIntents.swift in Sources */,
+				FBB108A425BB2237ECD952A6 /* WallpaperService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -748,8 +752,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				INFOPLIST_FILE = BauhausIOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -773,8 +777,8 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				INFOPLIST_FILE = BauhausIOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -888,7 +892,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
 	rootObject = CAFE00010000000000000000 /* Project object */;
 }

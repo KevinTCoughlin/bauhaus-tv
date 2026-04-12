@@ -4,7 +4,6 @@ final class BauhausAPI {
     static let shared = BauhausAPI()
 
     private let session: URLSession
-    private static let base = "https://bauhaus.cascadiacollections.workers.dev"
 
     private init() {
         let cache = URLCache(
@@ -23,26 +22,37 @@ final class BauhausAPI {
 
     // MARK: - URL builders
 
+    private static let baseURL = URL(string: "https://bauhaus.cascadiacollections.workers.dev")!
+
     static func imageURL(for date: Date = Date()) -> URL {
         if Calendar.current.isDateInToday(date) {
-            return URL(string: "\(base)/api/today?format=jpeg")!
+            var components = URLComponents(url: baseURL.appendingPathComponent("api/today"), resolvingAgainstBaseURL: false)!
+            components.queryItems = [URLQueryItem(name: "format", value: "jpeg")]
+            return components.url!
         }
-        return URL(string: "\(base)/api/\(dateString(from: date))?format=jpeg")!
+        var components = URLComponents(url: baseURL.appendingPathComponent("api/\(dateString(from: date))"), resolvingAgainstBaseURL: false)!
+        components.queryItems = [URLQueryItem(name: "format", value: "jpeg")]
+        return components.url!
     }
 
     static func metadataURL(for date: Date = Date()) -> URL {
         if Calendar.current.isDateInToday(date) {
-            return URL(string: "\(base)/api/today.json")!
+            return baseURL.appendingPathComponent("api/today.json")
         }
-        return URL(string: "\(base)/api/\(dateString(from: date)).json")!
+        return baseURL.appendingPathComponent("api/\(dateString(from: date)).json")
     }
 
     static func dateString(from date: Date) -> String {
+        iso8601DateFormatter.string(from: date)
+    }
+
+    /// Cached POSIX date formatter for YYYY-MM-DD strings.
+    static let iso8601DateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM-dd"
         f.locale = Locale(identifier: "en_US_POSIX")
-        return f.string(from: date)
-    }
+        return f
+    }()
 
     // MARK: - Errors
 
@@ -72,5 +82,17 @@ final class BauhausAPI {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return try decoder.decode(ArtworkMetadata.self, from: data)
+    }
+
+    /// Prefetch the image into the shared URLCache so AsyncImage serves it from cache.
+    func prefetchImage(for date: Date) async {
+        let url = Self.imageURL(for: date)
+        let request = URLRequest(url: url)
+
+        // Skip if already cached
+        if URLCache.shared.cachedResponse(for: request) != nil { return }
+
+        // Fire the request; response is stored in URLCache.shared automatically
+        _ = try? await session.data(for: request)
     }
 }

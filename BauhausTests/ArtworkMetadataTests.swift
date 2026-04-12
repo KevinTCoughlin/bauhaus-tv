@@ -10,7 +10,7 @@ final class ArtworkMetadataTests: XCTestCase {
     }()
 
     private func makeJSON(date: String = "2026-03-25") -> Data {
-        """
+        Data("""
         {
             "title": "Wheat Field with Crows",
             "artist": "Vincent van Gogh",
@@ -18,7 +18,7 @@ final class ArtworkMetadataTests: XCTestCase {
             "style_title": "The Great Wave",
             "style_artist": "Katsushika Hokusai"
         }
-        """.data(using: .utf8)!
+        """.utf8)
     }
 
     func testDecoding() throws {
@@ -47,14 +47,14 @@ final class ArtworkMetadataTests: XCTestCase {
     }
 
     func testDecodingFailsWithMissingRequiredField() {
-        let json = """
+        let json = Data("""
         {
             "title": "Test",
             "artist": "Artist",
             "date": "2026-03-25",
             "style_title": "Style"
         }
-        """.data(using: .utf8)!
+        """.utf8)
 
         XCTAssertThrowsError(try decoder.decode(ArtworkMetadata.self, from: json))
     }

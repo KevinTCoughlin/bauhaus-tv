@@ -8,11 +8,19 @@ struct ArtworkMetadata: Codable {
     let styleArtist: String
 
     var formattedDate: String {
-        let input = DateFormatter()
-        input.dateFormat = "yyyy-MM-dd"
-        guard let d = input.date(from: date) else { return date }
-        let output = DateFormatter()
-        output.dateFormat = "MMM d"
-        return output.string(from: d)
+        guard let d = Self.inputFormatter.date(from: date) else { return date }
+        return Self.outputFormatter.string(from: d)
     }
+
+    private static let inputFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f
+    }()
+
+    private static let outputFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MMM d"
+        return f
+    }()
 }

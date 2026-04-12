@@ -1,0 +1,29 @@
+# SwiftLint configuration for bauhaus-tv
+
+excluded:
+  - DerivedData
+  - .build
+  - .swiftpm
+
+# Relax rules that conflict with the project's existing style
+identifier_name:
+  min_length: 1
+  excluded:
+    - id
+
+line_length:
+  warning: 150
+  error: 200
+
+# Auto-correctable
+trailing_comma:
+  mandatory_comma: false
+
+# Opt-in rules worth enabling
+opt_in_rules:
+  - closure_spacing
+  - empty_count
+  - fatal_error_message
+  - first_where
+  - toggle_bool
+  - unavailable_function

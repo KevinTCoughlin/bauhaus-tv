@@ -22,11 +22,12 @@ final class ArtworkViewModel {
     var imageURL: URL { BauhausAPI.imageURL(for: currentDate) }
 
     var canGoForward: Bool {
-        guard let latest = latestArtworkDate else {
-            return !Calendar.current.isDateInToday(currentDate)
-        }
         let cal = Calendar.current
-        return cal.startOfDay(for: currentDate) < cal.startOfDay(for: latest)
+        if let latest = latestArtworkDate {
+            // Can't go forward past the latest artwork
+            return cal.startOfDay(for: currentDate) < cal.startOfDay(for: latest)
+        }
+        return !cal.isDateInToday(currentDate)
     }
 
     var canGoBack: Bool {
@@ -51,11 +52,7 @@ final class ArtworkViewModel {
     }
 
     func returnToToday() {
-        if let latest = latestArtworkDate {
-            navigateTo(date: latest)
-        } else {
-            navigateTo(date: Date())
-        }
+        navigateTo(date: Date())
     }
 
     func navigateTo(date: Date) {
@@ -117,11 +114,6 @@ final class ArtworkViewModel {
 
         latestArtworkDate = artDate
         defaults.set(BauhausAPI.dateString(from: Date()), forKey: lastUpdatedKey)
-
-        // If the real artwork date differs from calendar today, jump to it
-        if Calendar.current.isDateInToday(requestedDate) && !Calendar.current.isDate(artDate, inSameDayAs: requestedDate) {
-            currentDate = artDate
-        }
     }
 
     private func isInitialLoad(requestedDate: Date) -> Bool {

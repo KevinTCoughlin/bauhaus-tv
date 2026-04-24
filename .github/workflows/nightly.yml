@@ -52,7 +52,7 @@ jobs:
         run: echo "date=$(date -u +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
       - name: List available simulators
-        run: xcrun simctl list available devices tvOS
+        run: xcrun simctl list devices tvOS || true
 
       - name: Build (tvOS Simulator)
         run: |

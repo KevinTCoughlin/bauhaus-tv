@@ -78,7 +78,7 @@ jobs:
           zip -r "Bauhaus-tvOS-simulator-${{ steps.sha.outputs.short }}.zip" "$APP"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Bauhaus-tvOS-simulator-${{ github.sha }}
           path: Bauhaus-tvOS-simulator-*.zip

@@ -50,13 +50,16 @@ jobs:
         id: date
         run: echo "date=$(date -u +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
+      - name: List available simulators
+        run: xcrun simctl list available devices tvOS
+
       - name: Build (tvOS Simulator)
         run: |
           xcodebuild build \
             -project Bauhaus.xcodeproj \
             -scheme Bauhaus \
             -sdk appletvsimulator \
-            -destination 'platform=tvOS Simulator,name=Apple TV 4K (3rd generation)' \
+            -destination generic/platform=tvOS\ Simulator \
             -derivedDataPath DerivedData \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
@@ -66,6 +69,11 @@ jobs:
       - name: Package simulator app
         run: |
           APP=$(find DerivedData -name "Bauhaus.app" -not -path "*/Index.noindex/*" | head -1)
+          if [ -z "$APP" ]; then
+            echo "ERROR: Bauhaus.app not found in DerivedData"
+            ls -la DerivedData/Build/Products/ || true
+            exit 1
+          fi
           zip -r "Bauhaus-tvOS-simulator-${{ steps.sha.outputs.short }}.zip" "$APP"
 
       - name: Upload artifact

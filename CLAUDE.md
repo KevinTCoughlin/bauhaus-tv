@@ -24,8 +24,8 @@ xcodebuild test \
 
 MVVM with SwiftUI and `@Observable` (Swift Observation framework, tvOS 17+). Zero third-party dependencies.
 
-- **Caching** — 50 MB `URLCache` shared between `BauhausAPI` (URLSession) and `AsyncImage` (URLSession.shared). `BauhausAPI.init()` sets `URLCache.shared` so both use the same cache. Respects CDN `Cache-Control: max-age=300` on today's endpoints; past dates have 1-year immutable cache (no application-level skip needed).
-- **Skip logic** — `ArtworkViewModel.load()` checks `UserDefaults` key `lastUpdatedDate` against today before fetching. Only applies to today; past dates rely on URLCache.
+- **Caching** — 50 MB `URLCache` shared between `BauhausAPI` (URLSession) and `AsyncImage` (URLSession.shared). Today's reused URL uses protocol cache policy so stale responses are revalidated; dated image URLs use cache-first loading because they are immutable.
+- **Skip logic** — `ArtworkViewModel.load()` avoids reloading current metadata already held in memory. Network requests otherwise rely on URLCache and the CDN's cache headers.
 - **Image format** — `?format=jpeg` on all image URLs. tvOS lacks native AVIF; JPEG is universally safe.
 - **History navigation** — d-pad left/right on Siri Remote navigates between days. `currentDate` drives all URLs. Past dates use `/api/YYYY-MM-DD` and `/api/YYYY-MM-DD.json` routes.
 - **Crossfade** — `FadeInAsyncImage` fades opacity 0→1 over 1.2s on `.onAppear`. Call site uses `.id(viewModel.imageURL)` to force view recreation (and reset opacity) when the URL changes.

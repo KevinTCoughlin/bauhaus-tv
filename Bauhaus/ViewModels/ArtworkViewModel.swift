@@ -14,10 +14,13 @@ final class ArtworkViewModel {
     /// Used as the anchor for history navigation so we only browse dates with actual content.
     private var latestArtworkDate: Date?
 
-    private let api = BauhausAPI.shared
-    private let defaults = UserDefaults.standard
-    private let lastUpdatedKey = "lastUpdatedDate"
+    private let api: any BauhausAPIProtocol
     private var loadTask: Task<Void, Never>?
+    private var activeLoadID: UUID?
+
+    init(api: any BauhausAPIProtocol = BauhausAPI.shared) {
+        self.api = api
+    }
 
     var imageURL: URL { BauhausAPI.imageURL(for: currentDate) }
 
@@ -71,41 +74,48 @@ final class ArtworkViewModel {
 
         guard shouldFetch(for: requestedDate) else { return }
 
+        let loadID = UUID()
+        activeLoadID = loadID
         isLoading = true
         error = nil
         isNotYetGenerated = false
+        defer {
+            if activeLoadID == loadID {
+                isLoading = false
+            }
+        }
 
         do {
             async let meta = api.fetchMetadata(for: requestedDate)
             async let _ = api.prefetchImage(for: requestedDate)
             let result = try await meta
-            guard !Task.isCancelled, currentDate == requestedDate else { return }
+            guard isActive(loadID, for: requestedDate) else { return }
             metadata = result
             handleSuccessfulLoad(result: result, requestedDate: requestedDate)
         } catch BauhausAPI.APIError.notFound {
-            guard !Task.isCancelled, currentDate == requestedDate else { return }
-            isNotYetGenerated = true
+            guard isActive(loadID, for: requestedDate) else { return }
+            isNotYetGenerated = Calendar.current.isDateInToday(requestedDate)
             error = BauhausAPI.APIError.notFound.errorDescription
         } catch {
-            guard !Task.isCancelled, currentDate == requestedDate else { return }
+            guard isActive(loadID, for: requestedDate) else { return }
             self.error = error.localizedDescription
         }
 
+        guard isActive(loadID, for: requestedDate) else { return }
         isLoading = false
-
         if isInitialLoad(requestedDate: requestedDate) {
             await prefetchHistory()
         }
     }
 
     private func shouldFetch(for requestedDate: Date) -> Bool {
-        let isCurrentOrLatest = Calendar.current.isDateInToday(requestedDate) || requestedDate == latestArtworkDate
-        guard isCurrentOrLatest else { return true }
-        let today = BauhausAPI.dateString(from: Date())
-        if let last = defaults.string(forKey: lastUpdatedKey), last == today, metadata != nil {
-            return false
-        }
-        return true
+        let isLatest = latestArtworkDate.map { Calendar.current.isDate(requestedDate, inSameDayAs: $0) } ?? false
+        let isCurrentOrLatest = Calendar.current.isDateInToday(requestedDate) || isLatest
+        return !isCurrentOrLatest || metadata == nil
+    }
+
+    private func isActive(_ loadID: UUID, for requestedDate: Date) -> Bool {
+        !Task.isCancelled && activeLoadID == loadID && currentDate == requestedDate
     }
 
     private func handleSuccessfulLoad(result: ArtworkMetadata, requestedDate: Date) {
@@ -113,11 +123,11 @@ final class ArtworkViewModel {
         guard isFirstLoad, let artDate = BauhausAPI.iso8601DateFormatter.date(from: result.date) else { return }
 
         latestArtworkDate = artDate
-        defaults.set(BauhausAPI.dateString(from: Date()), forKey: lastUpdatedKey)
     }
 
     private func isInitialLoad(requestedDate: Date) -> Bool {
-        requestedDate == latestArtworkDate || Calendar.current.isDateInToday(requestedDate)
+        let isLatest = latestArtworkDate.map { Calendar.current.isDate(requestedDate, inSameDayAs: $0) } ?? false
+        return isLatest || Calendar.current.isDateInToday(requestedDate)
     }
 
     /// Prefetch metadata + images for the past 6 days so swipe navigation is instant.

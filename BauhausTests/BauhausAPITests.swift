@@ -42,6 +42,21 @@ final class BauhausAPITests: XCTestCase {
         XCTAssertEqual(BauhausAPI.dateString(from: date), "2026-01-05")
     }
 
+    func testTodayImageUsesProtocolCachePolicy() {
+        let request = BauhausAPI.imageRequest(for: Date())
+        XCTAssertEqual(request.cachePolicy, .useProtocolCachePolicy)
+    }
+
+    func testPastImageUsesCachedDataElseLoad() {
+        let request = BauhausAPI.imageRequest(for: date(year: 2026, month: 3, day: 20))
+        XCTAssertEqual(request.cachePolicy, .returnCacheDataElseLoad)
+    }
+
+    func testUnknownImageURLUsesProtocolCachePolicy() {
+        let url = URL(string: "https://example.com/api/2026-03-20?format=jpeg")!
+        XCTAssertEqual(BauhausAPI.imageCachePolicy(for: url), .useProtocolCachePolicy)
+    }
+
     // MARK: - Helpers
 
     private func date(year: Int, month: Int, day: Int) -> Date {

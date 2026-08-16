@@ -1,16 +1,19 @@
 #if targetEnvironment(macCatalyst)
 import Foundation
 import Darwin
+import UIKit
 
 final class WallpaperService {
     static let shared = WallpaperService()
     private init() {}
 
     enum WallpaperError: LocalizedError {
+        case invalidImage
         case scriptFailed(Int32)
 
         var errorDescription: String? {
             switch self {
+            case .invalidImage: return "The downloaded file isn't a valid image."
             case .scriptFailed(let code): return "Failed to set wallpaper (exit \(code))."
             }
         }
@@ -24,16 +27,22 @@ final class WallpaperService {
             .appendingPathComponent("Pictures")
             .appendingPathComponent("bauhaus-wallpaper.jpg")
 
-        let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad)
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let data = try await BauhausAPI.shared.fetchImageData(from: url)
+        guard UIImage(data: data) != nil else {
+            throw WallpaperError.invalidImage
+        }
 
+        try FileManager.default.createDirectory(at: dest.deletingLastPathComponent(), withIntermediateDirectories: true)
         try data.write(to: dest, options: .atomic)
 
-        // Use POSIX file coercion; path is app-controlled.
-        let script = "tell application \"System Events\" to tell every desktop to set picture to POSIX file \"\(dest.path)\""
+        let script = """
+        on run argv
+            tell application "System Events" to tell every desktop to set picture to POSIX file (item 1 of argv)
+        end run
+        """
 
         var pid: pid_t = 0
-        let args: [String] = ["/usr/bin/osascript", "-e", script]
+        let args: [String] = ["/usr/bin/osascript", "-e", script, dest.path]
         var cArgs = args.map { strdup($0) }
         cArgs.append(nil)
         defer { cArgs.compactMap { $0 }.forEach { free($0) } }

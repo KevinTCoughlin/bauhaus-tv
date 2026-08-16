@@ -10,8 +10,8 @@ A tvOS, iOS, and macOS app that displays the daily Bauhaus stylized artwork full
 - **Set as wallpaper** — long press or right-click on macOS to set the current artwork as your desktop wallpaper
 - Top Shelf Extension: last 7 days shown on the Apple TV home screen
 - macOS Screen Saver: daily artwork as your screen saver
-- 50 MB disk cache via URLCache — one CDN request per day
-- Background refresh (tvOS): pre-fetches metadata every 6 hours
+- 50 MB protocol-aware disk cache via URLCache
+- Background refresh (tvOS): asks the system to pre-fetch metadata after roughly 6 hours
 
 ## Platforms
 
@@ -34,7 +34,7 @@ A tvOS, iOS, and macOS app that displays the daily Bauhaus stylized artwork full
 open Bauhaus.xcodeproj
 ```
 
-Set your Team in the Signing & Capabilities tab for both targets (`Bauhaus` and `BauhausTopShelf`), then build and run on the Apple TV simulator or device.
+For device builds, set your Team in Signing & Capabilities for the app and extension targets you plan to build. Simulator builds can use the signing-disabled commands below.
 
 ### Build from command line
 
@@ -109,3 +109,4 @@ Consumes the public Cloudflare Workers API:
 | Bauhaus (app) | `com.cascadiacollections.bauhaus-tv` |
 | BauhausTopShelf (extension) | `com.cascadiacollections.bauhaus-tv.topshelf` |
 | BauhausIOS (app) | `com.cascadiacollections.bauhaus-ios` |
+| BauhausScreenSaver (bundle) | `com.cascadiacollections.bauhaus-screensaver` |

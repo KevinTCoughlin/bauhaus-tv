@@ -1,23 +1,28 @@
 import Foundation
 
-final class BauhausAPI {
+protocol BauhausAPIProtocol {
+    func fetchMetadata(for date: Date) async throws -> ArtworkMetadata
+    func prefetchImage(for date: Date) async
+}
+
+final class BauhausAPI: BauhausAPIProtocol {
     static let shared = BauhausAPI()
 
     private let session: URLSession
 
     private init() {
-        let cache = URLCache(
+        let config = URLSessionConfiguration.default
+        config.urlCache = URLCache.shared
+        config.requestCachePolicy = .useProtocolCachePolicy
+        session = URLSession(configuration: config)
+    }
+
+    static func configureSharedCache() {
+        URLCache.shared = URLCache(
             memoryCapacity: 10 * 1024 * 1024,
             diskCapacity: 50 * 1024 * 1024,
             diskPath: "bauhaus"
         )
-        // Share this cache with AsyncImage (which uses URLSession.shared)
-        URLCache.shared = cache
-
-        let config = URLSessionConfiguration.default
-        config.urlCache = cache
-        config.requestCachePolicy = .useProtocolCachePolicy
-        session = URLSession(configuration: config)
     }
 
     // MARK: - URL builders
@@ -58,11 +63,13 @@ final class BauhausAPI {
 
     enum APIError: LocalizedError {
         case notFound
+        case invalidResponse
         case httpError(Int)
 
         var errorDescription: String? {
             switch self {
-            case .notFound:    return "Today's artwork hasn't been generated yet."
+            case .notFound: return "Artwork isn't available for this date."
+            case .invalidResponse: return "The server returned an invalid response."
             case .httpError(let code): return "Server error (\(code))."
             }
         }
@@ -72,27 +79,68 @@ final class BauhausAPI {
 
     func fetchMetadata(for date: Date = Date()) async throws -> ArtworkMetadata {
         let (data, response) = try await session.data(from: Self.metadataURL(for: date))
-        if let http = response as? HTTPURLResponse {
-            switch http.statusCode {
-            case 200...299: break
-            case 404:       throw APIError.notFound
-            default:        throw APIError.httpError(http.statusCode)
-            }
-        }
+        try validate(response)
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return try decoder.decode(ArtworkMetadata.self, from: data)
     }
 
+    func fetchImageData(for date: Date) async throws -> Data {
+        try await fetchImageData(using: Self.imageRequest(for: date))
+    }
+
+    func fetchImageData(from url: URL) async throws -> Data {
+        try await fetchImageData(using: Self.imageRequest(for: url))
+    }
+
+    static func imageRequest(for date: Date) -> URLRequest {
+        imageRequest(for: imageURL(for: date))
+    }
+
+    static func imageRequest(for url: URL) -> URLRequest {
+        URLRequest(url: url, cachePolicy: imageCachePolicy(for: url))
+    }
+
+    static func imageCachePolicy(for url: URL) -> URLRequest.CachePolicy {
+        let components = url.pathComponents.filter { $0 != "/" }
+        guard url.scheme == baseURL.scheme,
+              url.host == baseURL.host,
+              components.count == 2,
+              components[0] == "api",
+              let date = iso8601DateFormatter.date(from: components[1]),
+              dateString(from: date) == components[1]
+        else {
+            return .useProtocolCachePolicy
+        }
+        return .returnCacheDataElseLoad
+    }
+
+    private func fetchImageData(using request: URLRequest) async throws -> Data {
+        let (data, response) = try await session.data(for: request)
+        try validate(response)
+        return data
+    }
+
     /// Prefetch the image into the shared URLCache so AsyncImage serves it from cache.
     func prefetchImage(for date: Date) async {
-        let url = Self.imageURL(for: date)
-        let request = URLRequest(url: url)
+        let request = Self.imageRequest(for: date)
 
-        // Skip if already cached
-        if URLCache.shared.cachedResponse(for: request) != nil { return }
+        if request.cachePolicy == .returnCacheDataElseLoad,
+           URLCache.shared.cachedResponse(for: request) != nil {
+            return
+        }
 
-        // Fire the request; response is stored in URLCache.shared automatically
-        _ = try? await session.data(for: request)
+        _ = try? await fetchImageData(using: request)
+    }
+
+    private func validate(_ response: URLResponse) throws {
+        guard let http = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+        switch http.statusCode {
+        case 200...299: return
+        case 404: throw APIError.notFound
+        default: throw APIError.httpError(http.statusCode)
+        }
     }
 }

@@ -39,6 +39,7 @@ jobs:
 
       - name: Build & Test
         run: |
+          set -o pipefail
           xcodebuild test \
             -project Bauhaus.xcodeproj \
             -scheme Bauhaus \
@@ -49,7 +50,7 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            | xcpretty || true
+            | xcpretty
 
       - name: Code Coverage Summary
         if: always()
@@ -68,15 +69,38 @@ jobs:
 
       - name: Build
         run: |
+          set -o pipefail
           xcodebuild build \
             -project Bauhaus.xcodeproj \
             -scheme BauhausIOS \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -destination 'generic/platform=iOS Simulator' \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            | xcpretty || true
+            | xcpretty
+
+  build-catalyst:
+    name: Build (Mac Catalyst)
+    runs-on: macos-15
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.2.app/Contents/Developer
+
+      - name: Build
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project Bauhaus.xcodeproj \
+            -scheme BauhausIOS \
+            -destination 'platform=macOS,variant=Mac Catalyst' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty
 
   build-screensaver:
     name: Build (macOS Screen Saver)
@@ -90,6 +114,7 @@ jobs:
 
       - name: Build
         run: |
+          set -o pipefail
           xcodebuild build \
             -project Bauhaus.xcodeproj \
             -scheme BauhausScreenSaver \
@@ -98,4 +123,4 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            | xcpretty || true
+            | xcpretty

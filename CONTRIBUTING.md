@@ -5,8 +5,8 @@ Contributions welcome. Please open an issue before submitting a PR for non-trivi
 ## Getting Started
 
 1. Fork and clone the repo
-2. Open `Bauhaus.xcodeproj` in Xcode 15+
-3. Set your Team in **Signing & Capabilities** for both `Bauhaus` and `BauhausTopShelf` targets
+2. Open `Bauhaus.xcodeproj` in Xcode 26+
+3. For device builds, set your Team in **Signing & Capabilities** for the app and extension targets you plan to build
 4. Build and run on the Apple TV simulator
 
 ## Running Tests

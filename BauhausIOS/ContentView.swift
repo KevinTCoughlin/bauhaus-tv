@@ -4,6 +4,7 @@ import Photos
 struct ContentView: View {
     @State private var viewModel: ArtworkViewModel
     @State private var wallpaperToast: WallpaperToastState?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private enum WallpaperToastState: Equatable {
         case success, saveSuccess, failure(String)
@@ -20,6 +21,12 @@ struct ContentView: View {
             if case .failure = self { return true }
             return false
         }
+    }
+
+    private enum SaveError: LocalizedError {
+        case invalidImage
+
+        var errorDescription: String? { "Couldn't decode image." }
     }
 
     init(viewModel: ArtworkViewModel) {
@@ -88,28 +95,28 @@ struct ContentView: View {
                 .onEnded { value in
                     let dx = value.translation.width
                     if dx < -50 {
-                        withAnimation(.snappy) { viewModel.goToPreviousDay() }
+                        withAnimation(reduceMotion ? nil : .snappy) { viewModel.goToPreviousDay() }
                     } else if dx > 50 {
                         guard viewModel.canGoForward else { return }
-                        withAnimation(.snappy) { viewModel.goToNextDay() }
+                        withAnimation(reduceMotion ? nil : .snappy) { viewModel.goToNextDay() }
                     }
                 }
         )
         // Arrow keys: navigate history (Mac keyboard/trackpad)
         .focusable()
         .onKeyPress(.leftArrow) {
-            withAnimation(.snappy) { viewModel.goToPreviousDay() }
+            withAnimation(reduceMotion ? nil : .snappy) { viewModel.goToPreviousDay() }
             return .handled
         }
         .onKeyPress(.rightArrow) {
             guard viewModel.canGoForward else { return .ignored }
-            withAnimation(.snappy) { viewModel.goToNextDay() }
+            withAnimation(reduceMotion ? nil : .snappy) { viewModel.goToNextDay() }
             return .handled
         }
         // Deep link: bauhaus://open?date=YYYY-MM-DD or bauhaus-ios://open?date=YYYY-MM-DD
         .onOpenURL { url in
             guard let date = date(from: url) else { return }
-            withAnimation { viewModel.navigateTo(date: date) }
+            withAnimation(reduceMotion ? nil : .default) { viewModel.navigateTo(date: date) }
         }
         // Long press: set as macOS wallpaper
         #if targetEnvironment(macCatalyst)
@@ -168,32 +175,30 @@ struct ContentView: View {
         let url = viewModel.imageURL
         do {
             try await WallpaperService.shared.setWallpaper(from: url)
-            withAnimation(.snappy) { wallpaperToast = .success }
+            withAnimation(reduceMotion ? nil : .snappy) { wallpaperToast = .success }
         } catch {
-            withAnimation(.snappy) { wallpaperToast = .failure(error.localizedDescription) }
+            withAnimation(reduceMotion ? nil : .snappy) { wallpaperToast = .failure(error.localizedDescription) }
         }
         try? await Task.sleep(for: .seconds(2.5))
-        withAnimation(.easeOut) { wallpaperToast = nil }
+        withAnimation(reduceMotion ? nil : .easeOut) { wallpaperToast = nil }
     }
     #else
     @MainActor
     private func saveToPhotos() async {
-        let url = viewModel.imageURL
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
+            let data = try await BauhausAPI.shared.fetchImageData(for: viewModel.currentDate)
             guard let image = UIImage(data: data) else {
-                withAnimation(.snappy) { wallpaperToast = .failure("Couldn't decode image.") }
-                return
+                throw SaveError.invalidImage
             }
             try await PHPhotoLibrary.shared().performChanges {
                 PHAssetChangeRequest.creationRequestForAsset(from: image)
             }
-            withAnimation(.snappy) { wallpaperToast = .saveSuccess }
+            withAnimation(reduceMotion ? nil : .snappy) { wallpaperToast = .saveSuccess }
         } catch {
-            withAnimation(.snappy) { wallpaperToast = .failure(error.localizedDescription) }
+            withAnimation(reduceMotion ? nil : .snappy) { wallpaperToast = .failure(error.localizedDescription) }
         }
         try? await Task.sleep(for: .seconds(2.5))
-        withAnimation(.easeOut) { wallpaperToast = nil }
+        withAnimation(reduceMotion ? nil : .easeOut) { wallpaperToast = nil }
     }
     #endif
 

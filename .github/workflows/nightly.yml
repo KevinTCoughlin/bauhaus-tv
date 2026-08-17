@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   check-nightly:
@@ -56,6 +56,7 @@ jobs:
 
       - name: Build (tvOS Simulator)
         run: |
+          set -o pipefail
           xcodebuild build \
             -project Bauhaus.xcodeproj \
             -scheme Bauhaus \
@@ -65,7 +66,7 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            | xcpretty || true
+            | xcpretty
 
       - name: Package simulator app
         run: |
@@ -87,6 +88,8 @@ jobs:
   release:
     needs: [check-nightly, build]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Download artifact
@@ -123,4 +126,3 @@ jobs:
           files: artifacts/*.zip
           prerelease: true
           make_latest: false
-        continue-on-error: true

@@ -9,11 +9,7 @@ struct BauhausApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
-        URLCache.shared = URLCache(
-            memoryCapacity: 10 * 1024 * 1024,
-            diskCapacity: 50 * 1024 * 1024,
-            diskPath: "bauhaus"
-        )
+        BauhausAPI.configureSharedCache()
         BGTaskScheduler.shared.register(forTaskWithIdentifier: refreshTaskID, using: nil) { task in
             guard let refreshTask = task as? BGAppRefreshTask else { return }
             handleBackgroundRefresh(task: refreshTask)

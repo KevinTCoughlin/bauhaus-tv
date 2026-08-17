@@ -41,7 +41,7 @@ struct ContentView: View {
             .ignoresSafeArea(edges: .bottom)
             .allowsHitTesting(false)
             .opacity(showMetadata && viewModel.metadata != nil ? 1 : 0)
-            .animation(.easeInOut(duration: 0.3), value: showMetadata)
+            .animation(reduceMotion ? nil : .easeInOut(duration: 0.3), value: showMetadata)
 
             // Past-date indicator (top-leading, safe-area aware)
             if !Calendar.current.isDateInToday(viewModel.currentDate) {
@@ -82,7 +82,7 @@ struct ContentView: View {
                 .padding(.bottom, 80)
                 .padding(.top, 16)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
-                .transition(.opacity.animation(.easeInOut(duration: 0.25)))
+                .transition(.opacity)
                 .accessibilityHidden(true)
             }
 
@@ -95,28 +95,28 @@ struct ContentView: View {
         }
         // Play/Pause: toggle metadata overlay
         .onPlayPauseCommand {
-            withAnimation(.easeInOut(duration: 0.25)) {
+            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.25)) {
                 showMetadata.toggle()
             }
         }
         // Select (click): return to today when browsing history
         .onTapGesture {
             guard viewModel.canGoForward else { return }
-            withAnimation { viewModel.returnToToday() }
+            withAnimation(reduceMotion ? nil : .default) { viewModel.returnToToday() }
         }
         // D-pad: navigate history
         .focusable()
         .onMoveCommand { direction in
             switch direction {
-            case .left:  withAnimation(.snappy) { viewModel.goToPreviousDay() }
-            case .right: withAnimation(.snappy) { viewModel.goToNextDay() }
+            case .left:  withAnimation(reduceMotion ? nil : .snappy) { viewModel.goToPreviousDay() }
+            case .right: withAnimation(reduceMotion ? nil : .snappy) { viewModel.goToNextDay() }
             default: break
             }
         }
         // Deep link from Top Shelf: bauhaus://open?date=YYYY-MM-DD
         .onOpenURL { url in
             guard let date = date(from: url) else { return }
-            withAnimation { viewModel.navigateTo(date: date) }
+            withAnimation(reduceMotion ? nil : .default) { viewModel.navigateTo(date: date) }
         }
         .task {
             await viewModel.load()

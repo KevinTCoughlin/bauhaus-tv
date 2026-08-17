@@ -12,6 +12,8 @@ final class BauhausScreenSaverView: ScreenSaverView {
     }()
 
     private var lastLoadedDate: String?
+    private var imageTask: URLSessionDataTask?
+    private var activeRequestID: UUID?
     private let session: URLSession = {
         let config = URLSessionConfiguration.default
         config.urlCache = URLCache(
@@ -25,25 +27,24 @@ final class BauhausScreenSaverView: ScreenSaverView {
 
     override init?(frame: NSRect, isPreview: Bool) {
         super.init(frame: frame, isPreview: isPreview)
-        wantsLayer = true
-        layer?.backgroundColor = NSColor.black.cgColor
-        addSubview(imageView)
-        NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: topAnchor),
-            imageView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: trailingAnchor)
-        ])
-        animationTimeInterval = 60.0
+        configureView()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        configureView()
     }
 
     override func startAnimation() {
         super.startAnimation()
         loadTodayImage()
+    }
+
+    override func stopAnimation() {
+        imageTask?.cancel()
+        imageTask = nil
+        activeRequestID = nil
+        super.stopAnimation()
     }
 
     override func animateOneFrame() {
@@ -59,16 +60,43 @@ final class BauhausScreenSaverView: ScreenSaverView {
 
     // MARK: - Private
 
+    private func configureView() {
+        wantsLayer = true
+        layer?.backgroundColor = NSColor.black.cgColor
+        guard imageView.superview == nil else { return }
+        addSubview(imageView)
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            imageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: trailingAnchor)
+        ])
+        animationTimeInterval = 60.0
+    }
+
     private func loadTodayImage() {
-        lastLoadedDate = BauhausAPI.dateString(from: Date())
-        let url = BauhausAPI.imageURL(for: Date())
-        var request = URLRequest(url: url)
-        request.cachePolicy = .returnCacheDataElseLoad
-        session.dataTask(with: request) { [weak self] data, _, _ in
-            guard let self, let data, let image = NSImage(data: data) else { return }
+        guard imageTask == nil else { return }
+        let date = Date()
+        let requestedDate = BauhausAPI.dateString(from: date)
+        let requestID = UUID()
+        activeRequestID = requestID
+        let request = BauhausAPI.imageRequest(for: date)
+        imageTask = session.dataTask(with: request) { [weak self] data, response, _ in
+            guard let self else { return }
             DispatchQueue.main.async {
+                guard self.activeRequestID == requestID else { return }
+                self.imageTask = nil
+                self.activeRequestID = nil
+                guard self.isAnimating else { return }
+                guard let http = response as? HTTPURLResponse,
+                      (200...299).contains(http.statusCode),
+                      let data,
+                      let image = NSImage(data: data)
+                else { return }
+                self.lastLoadedDate = requestedDate
                 self.imageView.image = image
             }
-        }.resume()
+        }
+        imageTask?.resume()
     }
 }

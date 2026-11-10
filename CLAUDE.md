@@ -43,7 +43,7 @@ MVVM with SwiftUI and `@Observable` (Swift Observation framework, tvOS 17+). Zer
 
 ## API
 
-Backend: [bauhaus](https://github.com/KevinTCoughlin/bauhaus) — Python pipeline on GitHub Actions → Cloudflare R2 + Workers.
+Backend: [bauhaus](https://github.com/cascadiacollections/bauhaus) — Python pipeline on GitHub Actions → Cloudflare R2 + Workers.
 
 | Endpoint | Purpose |
 |---|---|

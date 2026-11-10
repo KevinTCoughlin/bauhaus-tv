@@ -1,6 +1,6 @@
 # Bauhaus for Apple TV, iOS & macOS
 
-A tvOS, iOS, and macOS app that displays the daily Bauhaus stylized artwork full-screen. Powered by the [bauhaus](https://github.com/kevintcoughlin/bauhaus) backend — a zero-cost daily art generation pipeline using AdaIN neural style transfer.
+A tvOS, iOS, and macOS app that displays the daily Bauhaus stylized artwork full-screen. Powered by the [bauhaus](https://github.com/cascadiacollections/bauhaus) backend — a zero-cost daily art generation pipeline using AdaIN neural style transfer.
 
 ## Features
 

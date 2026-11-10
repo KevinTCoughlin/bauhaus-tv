@@ -353,7 +353,7 @@
 			name = BauhausScreenSaver;
 			productName = BauhausScreenSaver;
 			productReference = CAFE005F0000000000000000 /* BauhausScreenSaver.saver */;
-			productType = "com.apple.product-type.bundle.screensaver";
+			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
 
